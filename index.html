@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="dashboard">
+  <h2 class="dashboard-title">Добро пожаловать, <span id="uname">...</span>!</h2>
+
+  <div id="cabinet-list" class="cabinet-list"></div>
+</div>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  const tg = window.Telegram.WebApp;
+  tg.expand();
+  const user = tg.initDataUnsafe?.user;
+  if (!user) {
+    document.querySelector(".dashboard-title").innerText =
+      "⚠️ Откройте приложение из Telegram.";
+    return;
+  }
+
+  document.getElementById("uname").innerText = user.first_name || user.username;
+
+  try {
+    const resp = await fetch("/dashboard/api/login", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        telegram_id: user.id,
+        name: user.first_name || user.username || "User"
+      })
+    });
+    const data = await resp.json();
+    if (data.ok) {
+      loadCabinets(user.id);
+    }
+  } catch (e) {
+    console.error("Ошибка авторизации:", e);
+  }
+});
+
+async function loadCabinets(uid) {
+  const res = await fetch(`/dashboard/api/user/${uid}`);
+  const user = await res.json();
+  const div = document.getElementById("cabinet-list");
+  div.innerHTML = "";
+
+  if (!user.cabinets || user.cabinets.length === 0) {
+    div.innerHTML = "<p>Нет добавленных кабинетов.</p>";
+    return;
+  }
+
+  user.cabinets.forEach(cab => {
+    const el = document.createElement("div");
+    el.className = "cabinet-card";
+    el.innerHTML = `
+      <h3>${cab.name}</h3>
+      <p class="status">${cab.active ? '🟢 Включён' : '🔴 Отключён'}</p>
+      <button class="btn" onclick="openCabinet(${uid}, ${cab.id})">⚙️ Редактировать</button>
+    `;
+    div.appendChild(el);
+  });
+}
+
+function openCabinet(uid, id) {
+  window.location.href = `/dashboard/cabinet/${id}?uid=${uid}`;
+}
+</script>
+
+{% endblock %}
