@@ -1,4 +1,4 @@
-/* === Liquid Glass UI (адаптивная версия для телефона) === */
+/* === VK Checker Mini App — адаптивный Liquid Glass UI === */
 body {
   margin: 0;
   font-family: 'Inter', sans-serif;
@@ -11,24 +11,26 @@ body {
   box-sizing: border-box;
 }
 
+/* === Верхняя шапка === */
 header {
   width: 100%;
   text-align: center;
-  padding: 0.6rem 0; /* уменьшено */
-  font-size: 2rem;
+  padding: 0.6rem 0;
+  font-size: 1.2rem;
   font-weight: 600;
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* === Контейнер контента === */
 .container {
   width: 90%;
   max-width: 650px;
   margin: 1.2rem auto;
   background: rgba(255, 255, 255, 0.08);
   border-radius: 18px;
-  padding: 4vw; /* адаптивный padding */
+  padding: 4vw;
   box-shadow: 0 4px 20px rgba(0,0,0,0.3);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255,255,255,0.15);
@@ -36,11 +38,13 @@ header {
   overflow-wrap: break-word;
 }
 
+/* === Заголовки === */
 h2, h3 {
   margin-top: 0;
   text-align: center;
 }
 
+/* === Основные кнопки === */
 button, .btn, .btn-secondary {
   display: block;
   width: 100%;
@@ -54,7 +58,7 @@ button, .btn, .btn-secondary {
   text-decoration: none;
   text-align: center;
   font-size: 1rem;
-  margin-top: 0.5rem;
+  margin-top: 0.4rem;
 }
 
 button:hover, .btn:hover, .btn-secondary:hover {
@@ -62,40 +66,96 @@ button:hover, .btn:hover, .btn-secondary:hover {
   transform: scale(1.02);
 }
 
+/* === Карточка кабинета на главной === */
 .cabinet-card {
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(15px);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 12px;
   padding: 0.8rem 1rem;
-  margin-bottom: 0.7rem; /* стало меньше */
+  margin-bottom: 0.7rem;
   box-shadow: 0 2px 8px rgba(0,0,0,0.25);
 }
 
 .cabinet-card h4 {
-  margin: 0 0 0.4rem 0;
+  margin: 0 0 0.3rem 0;
   font-size: 1.05rem;
 }
 
+/* === Цвета статусов === */
 .status-active { color: #7cff96; font-weight: 600; }
 .status-inactive { color: #ff7777; font-weight: 600; }
 
+/* === Блок с заголовком и стрелкой === */
+.cabinet-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  width: 100%;
+  margin-bottom: 0.3rem; /* меньше отступ после заголовка */
+}
+
+.back-btn {
+  background: transparent;
+  color: white;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.2s;
+  padding: 0;
+}
+
+.back-btn:hover {
+  transform: translateX(-2px);
+  opacity: 0.8;
+}
+
+/* === Название кабинета === */
+#cabinet-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+/* === Статус кабинета === */
+#cabinet-status {
+  margin: 0.2rem 0 0.6rem 0; /* уменьшен отступ между заголовком и статусом */
+  font-size: 0.95rem;
+}
+
+/* === Надпись Settings под статусом === */
+.settings-title {
+  text-align: left;
+  font-size: 1.05rem;
+  font-weight: 500;
+  margin: 0.4rem 0 0.5rem 0.1rem;
+  opacity: 0.85;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding-bottom: 0.3rem;
+}
+
+/* === Контейнер настроек === */
 .settings-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.8rem;
   width: 100%;
-  margin-top: 1rem;
 }
 
-.settings-title {
-  font-size: 1.2rem;
-  font-weight: 500;
-  margin-bottom: 0.6rem;
-  opacity: 0.85;
+/* === Текстовые поля === */
+textarea {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.08);
+  color: white;
+  padding: 0.8rem;
+  resize: vertical;
+  backdrop-filter: blur(8px);
 }
 
+/* === Подвал === */
 footer {
   text-align: center;
   font-size: 0.8rem;
@@ -103,45 +163,7 @@ footer {
   padding-bottom: 1rem;
 }
 
-.settings-header {
-  width: 100%;
-  position: relative;
-  margin-bottom: 0.4rem;
-}
-
-/* Стрелка назад */
-.back-btn {
-  position: absolute;
-  top: 0.1rem;
-  left: 0;
-  background: transparent;
-  color: white;
-  border: none;
-  font-size: 0.95rem;  /* немного меньше */
-  cursor: pointer;
-  transition: 0.2s;
-  padding: 0;
-}
-
-.back-btn:hover {
-  opacity: 0.8;
-  transform: translateX(-2px);
-}
-
-/* Заголовок Settings — теперь под стрелкой, по левому краю */
-.settings-title {
-  display: block;
-  text-align: left;
-  margin: 1.4rem 0 0.6rem 0;  /* немного ниже стрелки */
-  font-size: 1.1rem;
-  font-weight: 500;
-  opacity: 0.9;
-}
-
-.settings-container button {
-  margin-top: 0.4rem; /* уменьшенный отступ */
-}
-
+/* === Адаптив под телефоны === */
 @media (max-width: 480px) {
   header h1 {
     font-size: 1rem;
@@ -153,5 +175,8 @@ footer {
   button {
     font-size: 0.9rem;
     padding: 0.65rem 1rem;
+  }
+  #cabinet-title {
+    font-size: 1.15rem;
   }
 }
