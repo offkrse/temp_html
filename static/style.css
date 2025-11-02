@@ -1,0 +1,86 @@
+body {
+  font-family: "Inter", sans-serif;
+  background: radial-gradient(circle at top, #1b1b1f, #0f0f10);
+  color: white;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+header h1 {
+  font-size: 1.5rem;
+  margin: 20px 0;
+}
+
+.container {
+  padding: 10px;
+}
+
+/* ===== Dashboard ===== */
+.dashboard {
+  width: 90%;
+  margin: 0 auto;
+}
+.dashboard-title {
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+}
+.cabinet-card {
+  background: rgba(255,255,255,0.05);
+  border-radius: 16px;
+  padding: 15px;
+  margin: 10px 0;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+.cabinet-card h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+.status {
+  margin: 8px 0;
+}
+.btn {
+  width: 100%;
+  background: #1e1e25;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+.btn:hover {
+  background: #2a2a33;
+}
+
+/* ===== Cabinet Page ===== */
+.cabinet-page {
+  width: 90%;
+  margin: 0 auto;
+  text-align: center;
+}
+.settings-container {
+  background: rgba(255,255,255,0.05);
+  border-radius: 20px;
+  padding: 20px;
+  margin-top: 20px;
+}
+.settings-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.settings-btn {
+  background: #1c1f24;
+  color: white;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 12px;
+  text-align: left;
+  font-size: 1rem;
+  transition: 0.2s ease;
+}
+.settings-btn:hover {
+  background: #2a2f35;
+}
