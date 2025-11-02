@@ -101,20 +101,23 @@ button:hover, .btn:hover, .btn-secondary:hover {
   position: absolute;
   left: 0.2rem;
   top: 0.1rem;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.08);  /* лёгкий прозрачный фон */
   color: white;
-  border: none;
-  font-size: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-size: 0.95rem;
   cursor: pointer;
-  transition: 0.2s;
-  padding: 0.1rem 0.3rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 8px;                     /* скруглённый квадрат */
   line-height: 1;
-  width: auto;             /* 🚫 больше не тянется на всю ширину */
+  width: auto;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(6px);
 }
 
 .back-btn:hover {
-  opacity: 0.8;
+  background: rgba(255, 255, 255, 0.18);
   transform: translateX(-2px);
+  opacity: 0.9;
 }
 
 /* Название кабинета */
