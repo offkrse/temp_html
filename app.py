@@ -1,21 +1,21 @@
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, Response, Depends, HTTPException, status
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from jinja2 import Environment, FileSystemLoader
 import pathlib, json, os
 from dotenv import load_dotenv
 
-# === Настройки ===
+# === Загрузка .env ===
 load_dotenv("/opt/vk_checker/.env")
 
+# === Пути и настройки ===
 APP_DIR = pathlib.Path("/opt/vk_checker/webapp")
 USER_DIR = pathlib.Path("/opt/vk_checker/data/users")
 USER_DIR.mkdir(parents=True, exist_ok=True)
 
+# === Инициализация FastAPI ===
 app = FastAPI(title="VK Checker Mini App")
 templates = Environment(loader=FileSystemLoader(str(APP_DIR / "templates")))
-
-# Подключаем статику
 app.mount("/static", StaticFiles(directory=APP_DIR / "static"), name="static")
 
 
@@ -34,19 +34,16 @@ def save_user(user: dict):
     p.write_text(json.dumps(user, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-# === Основные маршруты ===
+# === Маршруты ===
 
 @app.get("/", response_class=HTMLResponse)
-async def root():
-    return HTMLResponse("<h3>VK Checker Mini App работает ✅</h3>")
-
-@app.get("/dashboard", response_class=HTMLResponse)
-@app.get("/dashboard/", response_class=HTMLResponse)
+@app.get("/dashboard", response_class=HTMLResponse)   # 👈 добавили alias
 async def index(request: Request):
-    """Главная страница мини-приложения"""
+    """Главная страница mini app"""
     return templates.get_template("index.html").render(title="VK Checker")
 
-@app.post("/dashboard/api/login")
+
+@app.post("/api/login")
 async def login(request: Request):
     """Авторизация пользователя по данным Telegram WebApp"""
     data = await request.json()
@@ -61,10 +58,9 @@ async def login(request: Request):
         user = {
             "telegram_id": int(uid),
             "name": name,
-            "cabinets": [
-                {"id": 1, "name": "MAIN", "active": False},
-            ]
-        ]
+            "chat_id": uid,
+            "cabinets": []
+        }
         save_user(user)
     else:
         user["name"] = name
@@ -72,7 +68,8 @@ async def login(request: Request):
 
     return {"ok": True, "message": f"Добро пожаловать, {name}!", "user": user}
 
-@app.get("/dashboard/api/user/{telegram_id}")
+
+@app.get("/api/user/{telegram_id}")
 async def get_user_data(telegram_id: int):
     """Возвращает данные пользователя"""
     user = load_user(str(telegram_id))
@@ -80,9 +77,10 @@ async def get_user_data(telegram_id: int):
         raise HTTPException(404, "Пользователь не найден")
     return user
 
-@app.post("/dashboard/api/toggle/{cabinet_id}")
+
+@app.post("/api/toggle/{cabinet_id}")
 async def toggle_cabinet(cabinet_id: int, request: Request):
-    """Переключает статус кабинета"""
+    """Переключает статус кабинета (активен / выключен)"""
     data = await request.json()
     uid = str(data.get("telegram_id"))
     user = load_user(uid)
@@ -91,24 +89,13 @@ async def toggle_cabinet(cabinet_id: int, request: Request):
 
     for c in user["cabinets"]:
         if c["id"] == cabinet_id:
-            c["active"] = not c.get("active", False)
+            c["active"] = not c.get("active", True)
             save_user(user)
-            return {"message": f"Статус: {'🟢 Включён' if c['active'] else '🔴 Отключён'}"}
+            return {"message": f"Статус: {'🟢 Активен' if c['active'] else '🔴 Отключен'}"}
     return {"message": "Кабинет не найден"}
 
 @app.get("/dashboard/cabinet/{cabinet_id}", response_class=HTMLResponse)
-async def cabinet_page(request: Request, cabinet_id: int):
-    """Страница одного кабинета"""
-    telegram_id = request.query_params.get("uid")
-    if not telegram_id:
-        return HTMLResponse("Ошибка: не указан uid", status_code=400)
-
-    user = load_user(telegram_id)
-    if not user:
-        return HTMLResponse("Пользователь не найден", status_code=404)
-
-    cab = next((c for c in user["cabinets"] if c["id"] == cabinet_id), None)
-    if not cab:
-        return HTMLResponse("Кабинет не найден", status_code=404)
-
-    return templates.get_template("cabinet.html").render(title=cab["name"], cabinet=cab, user=user)
+async def cabinet_settings(request: Request, cabinet_id: int):
+    """Страница настроек конкретного кабинета"""
+    template = templates.get_template("cabinet_settings.html")
+    return template.render(title="Настройки кабинета", cabinet_id=cabinet_id)
