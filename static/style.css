@@ -179,6 +179,46 @@ footer {
   padding-bottom: 1rem;
 }
 
+/* === Исправление перекрытия блоков кампаний === */
+#campaign-list,
+#add-campaign-form {
+  position: relative;
+  z-index: 1;
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+  padding: 0.6rem;
+  box-sizing: border-box;
+}
+
+#add-campaign-form {
+  z-index: 2; /* форма всегда выше списка */
+}
+
+#campaigns-box {
+  max-height: 200px;
+  overflow-y: auto;
+  word-break: break-word;
+}
+
+#new-campaigns {
+  display: block;
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  padding: 0.6rem;
+  box-sizing: border-box;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 0.95rem;
+  z-index: 3; /* чтобы быть поверх всего */
+}
+
+#save-campaigns {
+  margin-top: 0.5rem;
+}
+
 /* === Адаптив под телефоны === */
 @media (max-width: 480px) {
   header h1 {
