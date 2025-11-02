@@ -103,6 +103,40 @@ footer {
   padding-bottom: 1rem;
 }
 
+.settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.back-btn {
+  background: transparent;
+  color: white;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition: 0.2s;
+  padding: 0;
+}
+
+.back-btn:hover {
+  transform: translateX(-2px);
+  opacity: 0.8;
+}
+
+.settings-title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.settings-container button {
+  margin-top: 0.4rem; /* уменьшенный отступ */
+}
+
 @media (max-width: 480px) {
   header h1 {
     font-size: 1rem;
