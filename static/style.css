@@ -86,7 +86,7 @@ button:hover, .btn:hover, .btn-secondary:hover {
 .status-active { color: #7cff96; font-weight: 600; }
 .status-inactive { color: #ff7777; font-weight: 600; }
 
-/* === Шапка кабинета: стрелка слева, заголовок по центру === */
+/* === Шапка кабинета: стрелка слева, MAIN по центру === */
 .cabinet-header {
   position: relative;
   display: flex;
@@ -96,18 +96,20 @@ button:hover, .btn:hover, .btn-secondary:hover {
   margin-bottom: 0.3rem;
 }
 
+/* Стрелка: только слева, не перекрывает заголовок */
 .back-btn {
   position: absolute;
   left: 0.2rem;
-  top: 0;
+  top: 0.1rem;
   background: transparent;
   color: white;
   border: none;
   font-size: 1rem;
   cursor: pointer;
   transition: 0.2s;
-  padding: 0;
+  padding: 0.1rem 0.3rem;
   line-height: 1;
+  width: auto;             /* 🚫 больше не тянется на всю ширину */
 }
 
 .back-btn:hover {
@@ -115,6 +117,7 @@ button:hover, .btn:hover, .btn-secondary:hover {
   transform: translateX(-2px);
 }
 
+/* Название кабинета */
 #cabinet-title {
   margin: 0;
   font-size: 1.25rem;
@@ -123,14 +126,14 @@ button:hover, .btn:hover, .btn-secondary:hover {
   line-height: 1.2;
 }
 
-/* === Статус кабинета === */
+/* Статус — ближе к заголовку */
 #cabinet-status {
-  margin: 0.2rem 0 0.4rem 0;
+  margin: 0.25rem 0 0.4rem 0;
   text-align: center;
   font-size: 0.95rem;
 }
 
-/* === Надпись Settings — под статусом, по левому краю === */
+/* Settings — под статусом, по левому краю */
 .settings-title {
   width: 100%;
   text-align: left;
@@ -142,17 +145,19 @@ button:hover, .btn:hover, .btn-secondary:hover {
   padding-bottom: 0.3rem;
 }
 
-/* === Контейнер настроек === */
+/* Контейнер для формы настроек */
 .settings-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
+  box-sizing: border-box;
 }
 
-/* === Текстовые поля === */
+/* Поле ввода — не выходит за рамки */
 textarea {
   width: 100%;
+  max-width: 100%;
   border-radius: 10px;
   border: 1px solid rgba(255,255,255,0.2);
   background: rgba(255,255,255,0.08);
@@ -160,6 +165,7 @@ textarea {
   padding: 0.8rem;
   resize: vertical;
   backdrop-filter: blur(8px);
+  box-sizing: border-box;  /* 🚫 предотвращает переполнение */
 }
 
 /* === Подвал === */
