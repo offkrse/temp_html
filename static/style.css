@@ -8,12 +8,13 @@ body {
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
+  box-sizing: border-box;
 }
 
 header {
   width: 100%;
   text-align: center;
-  padding: 0.6rem 0; /* было 1.2rem → уменьшено в 2 раза */
+  padding: 0.6rem 0; /* уменьшено */
   font-size: 1.2rem;
   font-weight: 600;
   background: rgba(255, 255, 255, 0.05);
@@ -24,17 +25,20 @@ header {
 .container {
   width: 90%;
   max-width: 650px;
-  margin: 1.5rem auto;
+  margin: 1.2rem auto;
   background: rgba(255, 255, 255, 0.08);
   border-radius: 18px;
-  padding: 1.5rem;
+  padding: 4vw; /* адаптивный padding */
   box-shadow: 0 4px 20px rgba(0,0,0,0.3);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255,255,255,0.15);
+  box-sizing: border-box;
+  overflow-wrap: break-word;
 }
 
 h2, h3 {
   margin-top: 0;
+  text-align: center;
 }
 
 button, .btn, .btn-secondary {
@@ -44,13 +48,13 @@ button, .btn, .btn-secondary {
   color: white;
   border: none;
   border-radius: 12px;
-  padding: 0.8rem 1.2rem;
+  padding: 0.7rem 1.2rem;
   cursor: pointer;
   transition: 0.25s;
   text-decoration: none;
   text-align: center;
   font-size: 1rem;
-  margin-top: 0.6rem;
+  margin-top: 0.5rem;
 }
 
 button:hover, .btn:hover, .btn-secondary:hover {
@@ -62,10 +66,15 @@ button:hover, .btn:hover, .btn-secondary:hover {
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(15px);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 14px;
-  padding: 1rem 1.2rem;
-  margin-bottom: 1rem;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+  margin-bottom: 0.7rem; /* стало меньше */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+
+.cabinet-card h4 {
+  margin: 0 0 0.4rem 0;
+  font-size: 1.05rem;
 }
 
 .status-active { color: #7cff96; font-weight: 600; }
@@ -77,13 +86,13 @@ button:hover, .btn:hover, .btn-secondary:hover {
   align-items: center;
   gap: 0.8rem;
   width: 100%;
-  margin-top: 1.2rem;
+  margin-top: 1rem;
 }
 
 .settings-title {
   font-size: 1.2rem;
   font-weight: 500;
-  margin-bottom: 0.8rem;
+  margin-bottom: 0.6rem;
   opacity: 0.85;
 }
 
@@ -100,9 +109,10 @@ footer {
   }
   .container {
     width: 94%;
-    padding: 1.2rem;
+    padding: 4vw;
   }
   button {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+    padding: 0.65rem 1rem;
   }
 }
