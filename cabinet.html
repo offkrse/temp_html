@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="cabinet-page">
+  <h2>{{ cabinet.name }}</h2>
+  <p class="status">
+    {% if cabinet.active %}
+      <span class="status-active">🟢 Включён</span>
+    {% else %}
+      <span class="status-inactive">🔴 Отключён</span>
+    {% endif %}
+  </p>
+
+  <div class="settings-container">
+    <h3>Settings</h3>
+    <div class="settings-buttons">
+      <button class="settings-btn" onclick="toggleCabinet({{ cabinet.id }}, {{ user.telegram_id }})">
+        {% if cabinet.active %}Выключить кабинет{% else %}Включить кабинет{% endif %}
+      </button>
+      <button class="settings-btn" onclick="alert('📋 Список кампаний в разработке')">
+        Показать список кампаний
+      </button>
+      <button class="settings-btn" onclick="alert('➕ Добавление кампаний в разработке')">
+        Добавить кампании
+      </button>
+      <button class="settings-btn" onclick="alert('⚙️ Изменение фильтра в разработке')">
+        Изменить фильтр
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleCabinet(id, uid) {
+  fetch(`/dashboard/api/toggle/${id}`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({telegram_id: uid})
+  })
+    .then(r => r.json())
+    .then(d => alert(d.message))
+    .then(() => location.reload());
+}
+</script>
+
+{% endblock %}
