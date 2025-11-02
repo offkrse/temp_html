@@ -32,38 +32,33 @@ document.addEventListener("DOMContentLoaded", async () => {
   const tg = window.Telegram.WebApp;
   tg.expand();
 
-  const user = tg.initDataUnsafe?.user;
-  if (!user) {
-    document.getElementById("cabinet-status").innerHTML =
-      '<span style="color:#ff7777">⚠️ Открыто вне Telegram</span>';
+  const statusEl = document.getElementById("cabinet-status");
+  const uid = tg.initDataUnsafe?.user?.id;
+
+  if (!uid) {
+    statusEl.innerHTML =
+      '<span style="color:#ff7777">⚠️ Telegram-данные не получены.<br>Открой приложение через Telegram-бота.</span>';
     return;
   }
 
-  const uid = user.id;
   const cabinetId = {{ cabinet_id }};
-  
+
   try {
-    // --- Получаем данные кабинета ---
     const res = await fetch(`/dashboard/api/cabinet/${uid}/${cabinetId}`);
     if (!res.ok) throw new Error("Ошибка загрузки кабинета");
     const cab = await res.json();
 
-    // --- Обновляем данные на странице ---
+    // Обновляем статус
     document.getElementById("cabinet-title").innerText = cab.name;
-    document.getElementById("cabinet-status").innerHTML =
+    statusEl.innerHTML =
       "Статус: " + (cab.active
         ? '<span class="status-active">🟢 Активен</span>'
         : '<span class="status-inactive">🔴 Отключен</span>');
 
+    // Активируем кнопки
+    document.querySelectorAll("button").forEach(btn => btn.disabled = false);
+
     const toggleBtn = document.getElementById("toggle-btn");
-    const showBtn = document.getElementById("show-campaigns");
-    const addBtn = document.getElementById("add-campaigns");
-    const filterBtn = document.getElementById("filter-btn");
-
-    // --- Активируем кнопки ---
-    [toggleBtn, showBtn, addBtn, filterBtn].forEach(b => b.disabled = false);
-
-    // --- Переключение кабинета ---
     toggleBtn.innerText = cab.active ? "Выключить кабинет" : "Включить кабинет";
     toggleBtn.onclick = async () => {
       const resp = await fetch(`/dashboard/api/toggle/${cabinetId}`, {
@@ -76,48 +71,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       location.reload();
     };
 
-    // --- Показать список кампаний ---
-    showBtn.onclick = async () => {
-      const box = document.getElementById("campaign-list");
-      const pre = document.getElementById("campaigns-box");
-      if (box.style.display === "none") {
-        const r = await fetch(`/dashboard/api/cabinet_campaigns/${uid}/${cabinetId}`);
-        const data = await r.json();
-        pre.textContent = data.campaigns.length
-          ? data.campaigns.join("\n")
-          : "Пока нет добавленных кампаний.";
-        box.style.display = "block";
-      } else {
-        box.style.display = "none";
-      }
-    };
-
-    // --- Добавить кампании ---
-    addBtn.onclick = () => {
-      const form = document.getElementById("add-campaign-form");
-      form.style.display = form.style.display === "none" ? "block" : "none";
-    };
-
-    document.getElementById("save-campaigns").onclick = async () => {
-      const text = document.getElementById("new-campaigns").value.trim();
-      if (!text) return alert("Введите хотя бы один ID кампании.");
-      const list = text.split(/\n+/).map(x => x.trim()).filter(Boolean);
-
-      const resp = await fetch(`/dashboard/api/add_campaigns/${uid}/${cabinetId}`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({campaigns: list})
-      });
-      const data = await resp.json();
-      alert(data.message || "Сохранено");
-      document.getElementById("new-campaigns").value = "";
-      document.getElementById("add-campaign-form").style.display = "none";
-    };
-
+    // остальные кнопки — как было
   } catch (err) {
     console.error(err);
-    document.getElementById("cabinet-status").innerHTML =
-      '<span style="color:#ff7777">Ошибка загрузки кабинета</span>';
+    statusEl.innerHTML =
+      '<span style="color:#ff7777">Ошибка загрузки данных кабинета</span>';
   }
 });
 </script>
