@@ -1,46 +1,56 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="cabinet-page">
-  <h2>{{ cabinet.name }}</h2>
-  <p class="status">
-    {% if cabinet.active %}
-      <span class="status-active">🟢 Включён</span>
-    {% else %}
-      <span class="status-inactive">🔴 Отключён</span>
-    {% endif %}
-  </p>
+<h2 id="cabinet-title">Кабинет</h2>
+<p id="cabinet-status">Статус: <span class="status-inactive">Загрузка...</span></p>
 
-  <div class="settings-container">
-    <h3>Settings</h3>
-    <div class="settings-buttons">
-      <button class="settings-btn" onclick="toggleCabinet({{ cabinet.id }}, {{ user.telegram_id }})">
-        {% if cabinet.active %}Выключить кабинет{% else %}Включить кабинет{% endif %}
-      </button>
-      <button class="settings-btn" onclick="alert('📋 Список кампаний в разработке')">
-        Показать список кампаний
-      </button>
-      <button class="settings-btn" onclick="alert('➕ Добавление кампаний в разработке')">
-        Добавить кампании
-      </button>
-      <button class="settings-btn" onclick="alert('⚙️ Изменение фильтра в разработке')">
-        Изменить фильтр
-      </button>
-    </div>
-  </div>
+<div class="settings-container">
+  <div class="settings-title">Settings</div>
+  <button id="toggle-btn">Загрузка...</button>
+  <button onclick="alert('📋 Список компаний пока в разработке')">Показать список компаний</button>
+  <button onclick="alert('➕ Добавление компаний пока в разработке')">Добавить компании</button>
+  <button onclick="alert('⚙️ Изменение фильтра пока в разработке')">Изменить фильтр</button>
 </div>
 
 <script>
-function toggleCabinet(id, uid) {
-  fetch(`/dashboard/api/toggle/${id}`, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({telegram_id: uid})
-  })
-    .then(r => r.json())
-    .then(d => alert(d.message))
-    .then(() => location.reload());
-}
+const cabinetId = {{ cabinet_id }};
+const tg = window.Telegram.WebApp;
+tg.expand();
+
+(async () => {
+  const user = tg.initDataUnsafe?.user;
+  if (!user) {
+    alert("⚠️ Приложение открыто вне Telegram");
+    return;
+  }
+
+  const res = await fetch(`/dashboard/api/user/${user.id}`);
+  const data = await res.json();
+  const cab = data.cabinets.find(c => c.id === cabinetId);
+  if (!cab) {
+    document.getElementById("cabinet-title").innerText = "Кабинет не найден";
+    return;
+  }
+
+  document.getElementById("cabinet-title").innerText = cab.name;
+  document.getElementById("cabinet-status").innerHTML =
+    "Статус: " + (cab.active
+      ? '<span class="status-active">🟢 Активен</span>'
+      : '<span class="status-inactive">🔴 Отключен</span>');
+
+  const toggleBtn = document.getElementById("toggle-btn");
+  toggleBtn.innerText = cab.active ? "Выключить кабинет" : "Включить кабинет";
+  toggleBtn.onclick = async () => {
+    const resp = await fetch(`/dashboard/api/toggle/${cabinetId}`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({telegram_id: user.id})
+    });
+    const r = await resp.json();
+    alert(r.message);
+    location.reload();
+  };
+})();
 </script>
 
 {% endblock %}
