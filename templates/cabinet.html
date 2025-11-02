@@ -6,10 +6,22 @@
 
 <div class="settings-container">
   <div class="settings-title">Settings</div>
+  
   <button id="toggle-btn">Загрузка...</button>
-  <button onclick="alert('📋 Список компаний пока в разработке')">Показать список компаний</button>
-  <button onclick="alert('➕ Добавление компаний пока в разработке')">Добавить компании</button>
+  <button id="show-campaigns">Показать список компаний</button>
+  <button id="add-campaigns">Добавить компании</button>
   <button onclick="alert('⚙️ Изменение фильтра пока в разработке')">Изменить фильтр</button>
+
+  <div id="campaign-list" style="margin-top:1rem; display:none; width:100%;">
+    <h4>Список кампаний:</h4>
+    <pre id="campaigns-box" style="white-space:pre-wrap; background:rgba(255,255,255,0.05); padding:0.6rem; border-radius:8px;"></pre>
+  </div>
+
+  <div id="add-campaign-form" style="margin-top:1rem; display:none; width:100%;">
+    <h4>Добавить кампании</h4>
+    <textarea id="new-campaigns" rows="4" placeholder="Введите ID кампаний, по одному в строке"></textarea>
+    <button id="save-campaigns">Сохранить</button>
+  </div>
 </div>
 
 <script>
@@ -24,20 +36,18 @@ tg.expand();
     return;
   }
 
-  const res = await fetch(`/dashboard/api/user/${user.id}`);
-  const data = await res.json();
-  const cab = data.cabinets.find(c => c.id === cabinetId);
-  if (!cab) {
-    document.getElementById("cabinet-title").innerText = "Кабинет не найден";
-    return;
-  }
+  // --- Получаем данные кабинета ---
+  const res = await fetch(`/dashboard/api/cabinet/${user.id}/${cabinetId}`);
+  const cab = await res.json();
 
+  // --- Название и статус ---
   document.getElementById("cabinet-title").innerText = cab.name;
   document.getElementById("cabinet-status").innerHTML =
     "Статус: " + (cab.active
       ? '<span class="status-active">🟢 Активен</span>'
       : '<span class="status-inactive">🔴 Отключен</span>');
 
+  // --- Кнопка вкл/выкл ---
   const toggleBtn = document.getElementById("toggle-btn");
   toggleBtn.innerText = cab.active ? "Выключить кабинет" : "Включить кабинет";
   toggleBtn.onclick = async () => {
@@ -49,6 +59,44 @@ tg.expand();
     const r = await resp.json();
     alert(r.message);
     location.reload();
+  };
+
+  // --- Показать список компаний ---
+  document.getElementById("show-campaigns").onclick = async () => {
+    const box = document.getElementById("campaign-list");
+    const pre = document.getElementById("campaigns-box");
+    if (box.style.display === "none") {
+      const r = await fetch(`/dashboard/api/cabinet_campaigns/${user.id}/${cabinetId}`);
+      const data = await r.json();
+      pre.textContent = data.campaigns.length
+        ? data.campaigns.join("\n")
+        : "Пока нет добавленных кампаний.";
+      box.style.display = "block";
+    } else {
+      box.style.display = "none";
+    }
+  };
+
+  // --- Добавить кампании ---
+  document.getElementById("add-campaigns").onclick = () => {
+    const form = document.getElementById("add-campaign-form");
+    form.style.display = form.style.display === "none" ? "block" : "none";
+  };
+
+  document.getElementById("save-campaigns").onclick = async () => {
+    const text = document.getElementById("new-campaigns").value.trim();
+    if (!text) return alert("Введите хотя бы один ID кампании.");
+    const list = text.split(/\n+/).map(x => x.trim()).filter(Boolean);
+
+    const resp = await fetch(`/dashboard/api/add_campaigns/${user.id}/${cabinetId}`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({campaigns: list})
+    });
+    const data = await resp.json();
+    alert(data.message || "Сохранено");
+    document.getElementById("new-campaigns").value = "";
+    document.getElementById("add-campaign-form").style.display = "none";
   };
 })();
 </script>
