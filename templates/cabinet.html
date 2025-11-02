@@ -2,13 +2,14 @@
 {% block content %}
 
 <div class="settings-container">
-  <div class="settings-header">
+  <div class="cabinet-header">
     <button class="back-btn" onclick="window.location.href='/dashboard'">←</button>
-    <h3 class="settings-title">Settings</h3>
+    <h2 id="cabinet-title">Кабинет</h2>
   </div>
 
-  <h2 id="cabinet-title" style="margin-top:0.5rem;">Кабинет</h2>
   <p id="cabinet-status">Статус: <span class="status-inactive">Загрузка...</span></p>
+
+  <h3 class="settings-title">Settings</h3>
 
   <button id="toggle-btn" disabled>Загрузка...</button>
   <button id="show-campaigns" disabled>Показать список компаний</button>
