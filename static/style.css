@@ -38,6 +38,21 @@ header {
   overflow-wrap: break-word;
 }
 
+/* === Приветствие на главной странице === */
+#hello {
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+  word-wrap: break-word;     /* перенос длинных слов */
+  overflow-wrap: anywhere;   /* защита от переполнения */
+  white-space: normal;
+}
+
+#tid {
+  word-break: break-all;
+}
+
 /* === Заголовки === */
 h2, h3 {
   margin-top: 0;
