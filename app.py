@@ -97,5 +97,5 @@ async def toggle_cabinet(cabinet_id: int, request: Request):
 @app.get("/dashboard/cabinet/{cabinet_id}", response_class=HTMLResponse)
 async def cabinet_settings(request: Request, cabinet_id: int):
     """Страница настроек конкретного кабинета"""
-    template = templates.get_template("cabinet_settings.html")
+    template = templates.get_template("cabinet.html")
     return template.render(title="Настройки кабинета", cabinet_id=cabinet_id)
