@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, Response, Depends, HTTPException, status
+from fastapi import FastAPI, Request, Response, Depends, HTTPException, status, Form
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from jinja2 import Environment, FileSystemLoader
@@ -93,6 +93,63 @@ async def toggle_cabinet(cabinet_id: int, request: Request):
             save_user(user)
             return {"message": f"Статус: {'🟢 Активен' if c['active'] else '🔴 Отключен'}"}
     return {"message": "Кабинет не найден"}
+
+@app.get("/api/cabinet/{telegram_id}/{cabinet_id}")
+async def get_cabinet(telegram_id: int, cabinet_id: int):
+    """Возвращает данные по одному кабинету"""
+    user = load_user(str(telegram_id))
+    if not user:
+        raise HTTPException(404, "Пользователь не найден")
+
+    for cab in user["cabinets"]:
+        if cab["id"] == cabinet_id:
+            return cab
+    raise HTTPException(404, "Кабинет не найден")
+
+
+@app.get("/api/cabinet_campaigns/{telegram_id}/{cabinet_id}")
+async def get_campaigns(telegram_id: int, cabinet_id: int):
+    """Возвращает список кампаний кабинета"""
+    user = load_user(str(telegram_id))
+    if not user:
+        raise HTTPException(404, "Пользователь не найден")
+
+    for cab in user["cabinets"]:
+        if cab["id"] == cabinet_id:
+            path = cab.get("allowed_campaigns_file")
+            if not path or not os.path.exists(path):
+                return {"campaigns": []}
+            with open(path, "r", encoding="utf-8") as f:
+                campaigns = [line.strip() for line in f if line.strip()]
+            return {"campaigns": campaigns}
+
+    raise HTTPException(404, "Кабинет не найден")
+
+
+@app.post("/api/add_campaigns/{telegram_id}/{cabinet_id}")
+async def add_campaigns(telegram_id: int, cabinet_id: int, request: Request):
+    """Добавляет новые кампании в allowed_campaigns_file"""
+    data = await request.json()
+    new_campaigns = data.get("campaigns", [])
+
+    if not new_campaigns or not isinstance(new_campaigns, list):
+        raise HTTPException(400, "Некорректные данные")
+
+    user = load_user(str(telegram_id))
+    if not user:
+        raise HTTPException(404, "Пользователь не найден")
+
+    for cab in user["cabinets"]:
+        if cab["id"] == cabinet_id:
+            path = cab.get("allowed_campaigns_file")
+            if not path:
+                raise HTTPException(400, "Не задан путь к файлу кампаний")
+            with open(path, "a", encoding="utf-8") as f:
+                for c in new_campaigns:
+                    f.write(f"{c}\n")
+            return {"ok": True, "message": f"Добавлено {len(new_campaigns)} кампаний"}
+
+    raise HTTPException(404, "Кабинет не найден")
 
 @app.get("/cabinet/{cabinet_id}", response_class=HTMLResponse)
 async def cabinet_settings(request: Request, cabinet_id: int):
