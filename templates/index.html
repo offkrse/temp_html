@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="dashboard">
-  <h2 class="dashboard-title">Добро пожаловать, <span id="uname">...</span>!</h2>
+<h2 id="hello">Загрузка...</h2>
 
-  <div id="cabinet-list" class="cabinet-list"></div>
+<div id="content" style="display:none;">
+  <div id="cabinet-list"></div>
 </div>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -12,15 +12,19 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const tg = window.Telegram.WebApp;
   tg.expand();
+
   const user = tg.initDataUnsafe?.user;
   if (!user) {
-    document.querySelector(".dashboard-title").innerText =
-      "⚠️ Откройте приложение из Telegram.";
+    document.getElementById("hello").innerText =
+      "⚠️ Приложение открыто вне Telegram, данные недоступны.";
     return;
   }
 
-  document.getElementById("uname").innerText = user.first_name || user.username;
+  // приветствие
+  document.getElementById("hello").innerText =
+    "Добро пожаловать, " + (user.first_name || user.username) + "!";
 
+  // авторизация / создание профиля
   try {
     const resp = await fetch("/dashboard/api/login", {
       method: "POST",
@@ -32,6 +36,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
     const data = await resp.json();
     if (data.ok) {
+      document.getElementById("content").style.display = "block";
       loadCabinets(user.id);
     }
   } catch (e) {
@@ -54,16 +59,15 @@ async function loadCabinets(uid) {
     const el = document.createElement("div");
     el.className = "cabinet-card";
     el.innerHTML = `
-      <h3>${cab.name}</h3>
-      <p class="status">${cab.active ? '🟢 Включён' : '🔴 Отключён'}</p>
-      <button class="btn" onclick="openCabinet(${uid}, ${cab.id})">⚙️ Редактировать</button>
+      <h4>${cab.name}</h4>
+      <p>Статус: ${
+        cab.active ? '<span class="status-active">🟢 Активен</span>'
+                    : '<span class="status-inactive">🔴 Отключен</span>'
+      }</p>
+      <button class="btn-secondary" onclick="window.location.href='/dashboard/cabinet/${cab.id}'">Редактировать</button>
     `;
     div.appendChild(el);
   });
-}
-
-function openCabinet(uid, id) {
-  window.location.href = `/dashboard/cabinet/${id}?uid=${uid}`;
 }
 </script>
 
