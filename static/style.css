@@ -284,6 +284,12 @@ footer {
   transform: scale(1.05);
 }
 
+/* Убираем стрелочки ↑↓ у числовых input */
+.glass-input input[type=number]::-webkit-inner-spin-button,
+.glass-input input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 
 
 /* === Адаптив под телефоны === */
