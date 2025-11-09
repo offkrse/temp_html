@@ -234,6 +234,22 @@ footer {
   margin-top: 0.5rem;
 }
 
+#filter-box input {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  border-radius: 6px;
+  padding: 0.25rem;
+  margin: 0 0.3rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+#filter-box p {
+  margin: 0.4rem 0;
+  line-height: 1.6;
+}
+
 /* === Адаптив под телефоны === */
 @media (max-width: 480px) {
   header h1 {
