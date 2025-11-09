@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const r = await fetch(`/dashboard/api/cabinet_campaigns/${uid}/${cabinetId}`);
         const data = await r.json();
         pre.textContent = data.campaigns.length
-          ? data.campaigns.join("\\n")
+          ? data.campaigns.join("\n")
           : "Пока нет добавленных кампаний.";
         box.style.display = "block";
       } else {
