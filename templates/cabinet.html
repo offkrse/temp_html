@@ -38,22 +38,30 @@
   <div id="filter-section" style="margin-top:1rem; display:none; width:100%;">
     <h4>Изменить фильтр</h4>
     <div id="filter-box">
-      <p><b>Отключать если:</b></p>
-      <p>
+      <div><b>Отключать если:</b></div>
+    
+      <div class="filter-row">
         Если потрачено 
-        <input id="spent_zero_result" type="number"> ₽ и результат = 0<br>
+        <input class="filter-input" id="spent_zero_result" type="number"> ₽ и результат = 0
+      </div>
+      <div class="filter-row">
         Если потрачено 
-        <input id="spent_zero_clicks" type="number"> ₽ и кликов = 0
-      </p>
-      <p>
+        <input class="filter-input" id="spent_zero_clicks" type="number"> ₽ и кликов = 0
+      </div>
+    
+      <div class="filter-row">
         Если потрачено 
-        <input id="min_spent_for_cpa" type="number"> ₽ и результат = 
-        <input id="cpa_bad_value" type="number"><br>
+        <input class="filter-input" id="min_spent_for_cpa" type="number"> ₽ и результат = 
+        <input class="filter-input" id="cpa_bad_value" type="number">
+      </div>
+    
+      <div class="filter-row">
         Если потрачено 
-        <input id="min_spent_for_cpc" type="number"> ₽ и кликов = 
-        <input id="cpc_bad_value" type="number">
-      </p>
+        <input class="filter-input" id="min_spent_for_cpc" type="number"> ₽ и кликов = 
+        <input class="filter-input" id="cpc_bad_value" type="number">
+      </div>
     </div>
+
     <button id="save-filter" style="margin-top:0.6rem;">Сохранить</button>
   </div>
 
