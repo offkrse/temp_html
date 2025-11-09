@@ -239,15 +239,17 @@ footer {
   border: 1px solid rgba(255,255,255,0.2);
   color: #fff;
   border-radius: 6px;
-  padding: 0.25rem;
-  margin: 0 0.3rem;
+  padding: 0.2rem 0.3rem;
+  margin: 0 0.25rem;
   text-align: center;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  width: 55px; /* 🔹 поле ровно под длину числа */
 }
 
 #filter-box p {
   margin: 0.4rem 0;
-  line-height: 1.6;
+  line-height: 1.4;
+  white-space: nowrap; /* 🔹 не переносить строки */
 }
 
 /* === Адаптив под телефоны === */
