@@ -2,6 +2,7 @@
 {% block content %}
 
 <div class="settings-container">
+  <!-- Заголовок -->
   <div class="cabinet-header">
     <button class="back-btn" onclick="window.location.href='/dashboard'">←</button>
     <h2 id="cabinet-title">Кабинет</h2>
@@ -11,11 +12,13 @@
 
   <h3 class="settings-title">Settings</h3>
 
+  <!-- Основные кнопки -->
   <button id="toggle-btn" disabled>Загрузка...</button>
   <button id="show-campaigns" disabled>Показать список компаний</button>
   <button id="add-campaigns" disabled>Добавить компании</button>
   <button id="filter-btn" disabled>Изменить фильтр</button>
 
+  <!-- Список компаний -->
   <div id="campaign-list" style="margin-top:1rem; display:none; width:100%;">
     <h4>Список кампаний:</h4>
     <pre id="campaigns-box"
@@ -23,14 +26,40 @@
                 padding:0.6rem; border-radius:8px;"></pre>
   </div>
 
+  <!-- Добавление кампаний -->
   <div id="add-campaign-form" style="margin-top:1rem; display:none; width:100%;">
     <h4>Добавить кампании</h4>
     <textarea id="new-campaigns" rows="4"
               placeholder="Введите ID кампаний, по одному в строке"></textarea>
     <button id="save-campaigns">Сохранить</button>
   </div>
+
+  <!-- Редактирование фильтра -->
+  <div id="filter-section" style="margin-top:1rem; display:none; width:100%;">
+    <h4>Изменить фильтр</h4>
+    <div id="filter-box" 
+         style="background:rgba(255,255,255,0.05);padding:0.8rem;border-radius:8px;">
+      <p><b>Отключать если:</b></p>
+      <p>
+        Если потрачено 
+        <input id="spent_zero_result" type="number" style="width:70px;"> ₽ и результат = 0<br>
+        Если потрачено 
+        <input id="spent_zero_clicks" type="number" style="width:70px;"> ₽ и кликов = 0
+      </p>
+      <p>
+        Если потрачено 
+        <input id="min_spent_for_cpa" type="number" style="width:70px;"> ₽ и результат = 
+        <input id="cpa_bad_value" type="number" style="width:70px;"> <br>
+        Если потрачено 
+        <input id="min_spent_for_cpc" type="number" style="width:70px;"> ₽ и кликов = 
+        <input id="cpc_bad_value" type="number" style="width:70px;">
+      </p>
+    </div>
+    <button id="save-filter" style="margin-top:0.6rem;">Сохранить</button>
+  </div>
 </div>
 
+<!-- === ЛОГИКА === -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", async () => {
@@ -48,10 +77,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   try {
+    // === Получаем данные кабинета ===
     const res = await fetch(`/dashboard/api/cabinet/${uid}/${cabinetId}`);
     if (!res.ok) throw new Error("Ошибка загрузки кабинета");
     const cab = await res.json();
 
+    // === Обновляем заголовок и статус ===
     document.getElementById("cabinet-title").innerText = cab.name;
     statusEl.innerHTML =
       "Статус: " + (cab.active
@@ -84,7 +115,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const r = await fetch(`/dashboard/api/cabinet_campaigns/${uid}/${cabinetId}`);
         const data = await r.json();
         pre.textContent = data.campaigns.length
-          ? data.campaigns.join("\n")
+          ? data.campaigns.join("\\n")
           : "Пока нет добавленных кампаний.";
         box.style.display = "block";
       } else {
@@ -95,6 +126,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // === Добавить кампании ===
     const addBtn = document.getElementById("add-campaigns");
     addBtn.onclick = () => {
+      document.getElementById("campaign-list").style.display = "none";
       const form = document.getElementById("add-campaign-form");
       form.style.display = form.style.display === "none" ? "block" : "none";
     };
@@ -102,7 +134,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("save-campaigns").onclick = async () => {
       const text = document.getElementById("new-campaigns").value.trim();
       if (!text) return alert("Введите хотя бы один ID кампании.");
-      const list = text.split(/\n+/).map(x => x.trim()).filter(Boolean);
+      const list = text.split(/\\n+/).map(x => x.trim()).filter(Boolean);
 
       const resp = await fetch(`/dashboard/api/add_campaigns/${uid}/${cabinetId}`, {
         method: "POST",
@@ -113,6 +145,49 @@ document.addEventListener("DOMContentLoaded", async () => {
       alert(data.message || "Сохранено");
       document.getElementById("new-campaigns").value = "";
       document.getElementById("add-campaign-form").style.display = "none";
+    };
+
+    // === Редактировать фильтр ===
+    const filterBtn = document.getElementById("filter-btn");
+    filterBtn.onclick = () => {
+      const section = document.getElementById("filter-section");
+      section.style.display = section.style.display === "none" ? "block" : "none";
+
+      if (section.dataset.loaded !== "true") {
+        const f = cab.filter || {};
+        document.getElementById("spent_zero_result").value = f.spent_zero_result ?? 0;
+        document.getElementById("spent_zero_clicks").value = f.spent_zero_clicks ?? 0;
+        document.getElementById("min_spent_for_cpa").value = f.min_spent_for_cpa ?? 0;
+        document.getElementById("cpa_bad_value").value = f.cpa_bad_value ?? 0;
+        document.getElementById("min_spent_for_cpc").value = f.min_spent_for_cpc ?? 0;
+        document.getElementById("cpc_bad_value").value = f.cpc_bad_value ?? 0;
+        section.dataset.loaded = "true";
+      }
+    };
+
+    // === Сохранить фильтр ===
+    document.getElementById("save-filter").onclick = async () => {
+      const newFilter = {
+        spent_zero_result: +document.getElementById("spent_zero_result").value,
+        spent_zero_clicks: +document.getElementById("spent_zero_clicks").value,
+        min_spent_for_cpa: +document.getElementById("min_spent_for_cpa").value,
+        cpa_bad_value: +document.getElementById("cpa_bad_value").value,
+        min_spent_for_cpc: +document.getElementById("min_spent_for_cpc").value,
+        cpc_bad_value: +document.getElementById("cpc_bad_value").value
+      };
+
+      try {
+        const resp = await fetch(`/dashboard/api/update_filter/${uid}/${cabinetId}`, {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({ filter: newFilter })
+        });
+        const data = await resp.json();
+        alert(data.message || "Фильтр сохранён");
+      } catch (e) {
+        alert("Ошибка сохранения фильтра");
+        console.error(e);
+      }
     };
 
   } catch (e) {
