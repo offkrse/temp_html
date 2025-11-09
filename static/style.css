@@ -234,17 +234,10 @@ footer {
   margin-top: 0.5rem;
 }
 
-#filter-box {
-  background: rgba(255, 255, 255, 0.05);
-  padding: 0.8rem;
-  border-radius: 14px;
-  box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.05),
-              0 4px 10px rgba(0,0,0,0.3);
-  backdrop-filter: blur(12px);
-}
-
 #filter-box input {
-  background: rgba(255, 255, 255, 0.12);
+  appearance: none;
+  -webkit-appearance: none;
+  background: rgba(255, 255, 255, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 10px;
   padding: 0.25rem 0.45rem;
@@ -255,25 +248,30 @@ footer {
   font-size: 0.9rem;
   font-weight: 500;
   transition: all 0.25s ease;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.25);
-  backdrop-filter: blur(15px);
+  box-shadow: inset 0 0 6px rgba(255,255,255,0.08),
+              0 2px 8px rgba(0,0,0,0.35);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
-/* эффект при наведении и фокусе */
+/* фокус и наведение */
 #filter-box input:hover,
 #filter-box input:focus {
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.25);
   border-color: rgba(255, 255, 255, 0.45);
-  transform: scale(1.05);
-  box-shadow: 0 0 10px rgba(255,255,255,0.25);
+  transform: scale(1.06);
+  box-shadow: 0 0 12px rgba(255,255,255,0.25),
+              0 0 4px rgba(255,255,255,0.2) inset;
   outline: none;
 }
 
+/* чтобы текст рядом не ломался */
 #filter-box p {
   margin: 0.4rem 0;
   line-height: 1.4;
   white-space: nowrap;
 }
+
 
 
 
