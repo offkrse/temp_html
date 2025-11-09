@@ -240,37 +240,53 @@ footer {
   display: flex;
   align-items: center;
   flex-wrap: nowrap;
+  justify-content: flex-start;
+  font-size: 0.9rem;
 }
 
-.filter-row input.filter-input {
-  appearance: none;
-  -webkit-appearance: none;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 10px;
-  padding: 0.25rem 0.4rem;
+/* Стиль “жидкого стекла” через псевдоэлемент */
+.filter-input {
+  position: relative;
+  z-index: 1;
+  border: none;
+  outline: none;
+  width: 30px;
+  padding: 0.3rem 0.4rem;
   margin: 0 0.3rem;
-  color: #fff;
-  width: 35px;
   text-align: center;
+  color: #fff;
   font-size: 0.9rem;
   font-weight: 500;
-  transition: all 0.25s ease;
-  box-shadow: inset 0 0 6px rgba(255,255,255,0.08),
-              0 2px 8px rgba(0,0,0,0.35);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  border-radius: 8px;
+  background: transparent;
+  isolation: isolate; /* нужно, чтобы backdrop работал */
 }
 
-.filter-row input.filter-input:hover,
-.filter-row input.filter-input:focus {
-  background: rgba(255, 255, 255, 0.25);
-  border-color: rgba(255, 255, 255, 0.45);
-  transform: scale(1.06);
-  box-shadow: 0 0 12px rgba(120,200,255,0.35),
-              0 0 4px rgba(120,200,255,0.2) inset;
-  outline: none;
+/* создаём фон через псевдоэлемент */
+.filter-input::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: inset 0 0 6px rgba(255,255,255,0.1),
+              0 2px 8px rgba(0,0,0,0.35);
+  z-index: -1;
+  transition: all 0.3s ease;
 }
+
+/* Ховер и фокус — ярче, с подсветкой */
+.filter-input:hover::before,
+.filter-input:focus::before {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 8px rgba(130,200,255,0.35),
+              0 0 4px rgba(130,200,255,0.25) inset;
+}
+
 
 
 
