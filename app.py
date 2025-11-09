@@ -125,6 +125,27 @@ async def get_campaigns(telegram_id: int, cabinet_id: int):
 
     raise HTTPException(404, "Кабинет не найден")
 
+@app.post("/api/update_filter/{telegram_id}/{cabinet_id}")
+async def update_filter(telegram_id: int, cabinet_id: int, request: Request):
+    """Обновление фильтра для кабинета"""
+    data = await request.json()
+    new_filter = data.get("filter")
+
+    if not isinstance(new_filter, dict):
+        raise HTTPException(400, "Некорректный формат фильтра")
+
+    user = load_user(str(telegram_id))
+    if not user:
+        raise HTTPException(404, "Пользователь не найден")
+
+    for cab in user["cabinets"]:
+        if cab["id"] == cabinet_id:
+            cab["filter"].update(new_filter)
+            save_user(user)
+            return {"ok": True, "message": "Фильтр успешно обновлён"}
+
+    raise HTTPException(404, "Кабинет не найден")
+
 
 @app.post("/api/add_campaigns/{telegram_id}/{cabinet_id}")
 async def add_campaigns(telegram_id: int, cabinet_id: int, request: Request):
