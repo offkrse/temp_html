@@ -42,42 +42,28 @@
     
       <div class="filter-row">
         Если потрачено&nbsp; 
-        <span class="glass-input">
-          <input id="spent_zero_result" type="number">
-        </span> ₽ и результат = 0
+        <span class="glass-input"><input id="spent_zero_result" type="number"></span> ₽ и результат = 0
       </div>
       
       <div class="filter-row">
         Если потрачено&nbsp; 
-        <span class="glass-input">
-          <input id="spent_zero_clicks" type="number">
-        </span> ₽ и кликов = 0
+        <span class="glass-input"><input id="spent_zero_clicks" type="number"></span> ₽ и кликов = 0
       </div>
       
       <div class="filter-row">
         Если потрачено&nbsp; 
-        <span class="glass-input">
-          <input id="min_spent_for_cpa" type="number">
-        </span> ₽ и результат =&nbsp; 
-        <span class="glass-input">
-          <input id="cpa_bad_value" type="number">
-        </span>
+        <span class="glass-input"><input id="min_spent_for_cpa" type="number"></span> ₽ и результат =&nbsp; 
+        <span class="glass-input"><input id="cpa_bad_value" type="number"></span>
       </div>
       
       <div class="filter-row">
         Если потрачено&nbsp;
-        <span class="glass-input">
-          <input id="min_spent_for_cpc" type="number">
-        </span> ₽ и кликов =&nbsp; 
-        <span class="glass-input">
-          <input id="cpc_bad_value" type="number">
-        </span>
+        <span class="glass-input"><input id="min_spent_for_cpc" type="number"></span> ₽ и кликов =&nbsp; 
+        <span class="glass-input"><input id="cpc_bad_value" type="number"></span>
       </div>
-
-
+    </div>
     <button id="save-filter" style="margin-top:0.6rem;">Сохранить</button>
   </div>
-
 </div>
 
 <!-- === ЛОГИКА === -->
@@ -117,14 +103,34 @@ document.addEventListener("DOMContentLoaded", async () => {
     const toggleBtn = document.getElementById("toggle-btn");
     toggleBtn.innerText = cab.active ? "Выключить кабинет" : "Включить кабинет";
     toggleBtn.onclick = async () => {
-      const resp = await fetch(`/dashboard/api/toggle/${cabinetId}`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({telegram_id: uid})
-      });
-      const r = await resp.json();
-      alert(r.message);
-      location.reload();
+      const oldText = toggleBtn.innerText;
+      try {
+        const resp = await fetch(`/dashboard/api/toggle/${cabinetId}`, {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({telegram_id: uid})
+        });
+        const r = await resp.json();
+
+        toggleBtn.style.background = "rgba(100,255,150,0.25)";
+        toggleBtn.style.color = "#7cff96";
+        toggleBtn.innerText = "✅ " + (r.message || "Изменено");
+        setTimeout(() => {
+          toggleBtn.innerText = oldText;
+          toggleBtn.style.background = "";
+          toggleBtn.style.color = "";
+          location.reload();
+        }, 2000);
+      } catch (e) {
+        toggleBtn.style.background = "rgba(255,80,80,0.25)";
+        toggleBtn.style.color = "#ff7777";
+        toggleBtn.innerText = "❌ Ошибка";
+        setTimeout(() => {
+          toggleBtn.innerText = oldText;
+          toggleBtn.style.background = "";
+          toggleBtn.style.color = "";
+        }, 2000);
+      }
     };
 
     // === Показать кампании ===
@@ -152,13 +158,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       form.style.display = form.style.display === "none" ? "block" : "none";
     };
 
-    document.getElementById("save-campaigns").onclick = async () => {
+    // === Сохранение кампаний ===
+    const saveCampaignsBtn = document.getElementById("save-campaigns");
+    saveCampaignsBtn.onclick = async () => {
       const textarea = document.getElementById("new-campaigns");
       const text = textarea.value.trim();
-      if (!text) return alert("Введите хотя бы один ID кампании.");
-      
+      if (!text) return;
+
       const list = text.split(/\n+/).map(x => x.trim()).filter(Boolean);
-    
+
       try {
         const resp = await fetch(`/dashboard/api/add_campaigns/${uid}/${cabinetId}`, {
           method: "POST",
@@ -166,28 +174,19 @@ document.addEventListener("DOMContentLoaded", async () => {
           body: JSON.stringify({ campaigns: list })
         });
         const data = await resp.json();
-    
-        // alert заменяем на визуальный отклик
-        tg.HapticFeedback.notificationOccurred("success");
-        const msg = data.message || "Сохранено";
-        console.log(msg);
-    
-        // добавляем временный текст под полем вместо alert
-        let notif = document.getElementById("campaign-notif");
-        if (!notif) {
-          notif = document.createElement("div");
-          notif.id = "campaign-notif";
-          notif.style.cssText = "margin-top:6px;font-size:0.9rem;opacity:0.8;";
-          textarea.parentNode.appendChild(notif);
-        }
-        notif.textContent = msg;
-        setTimeout(() => (notif.textContent = ""), 2500);
-    
-        // очищаем поле и возвращаем фокус
+
+        saveCampaignsBtn.style.background = "rgba(100,255,150,0.25)";
+        saveCampaignsBtn.style.color = "#7cff96";
+        saveCampaignsBtn.innerText = "✅ " + (data.message || "Сохранено");
+        setTimeout(() => {
+          saveCampaignsBtn.innerText = "Сохранить";
+          saveCampaignsBtn.style.background = "";
+          saveCampaignsBtn.style.color = "";
+        }, 2000);
+
         textarea.value = "";
         setTimeout(() => textarea.focus(), 200);
-    
-        // обновляем список компаний
+
         const r = await fetch(`/dashboard/api/cabinet_campaigns/${uid}/${cabinetId}`);
         const result = await r.json();
         const pre = document.getElementById("campaigns-box");
@@ -196,11 +195,16 @@ document.addEventListener("DOMContentLoaded", async () => {
           document.getElementById("campaign-list").style.display = "block";
         }
       } catch (e) {
-        tg.HapticFeedback.notificationOccurred("error");
-        console.error(e);
+        saveCampaignsBtn.style.background = "rgba(255,80,80,0.25)";
+        saveCampaignsBtn.style.color = "#ff7777";
+        saveCampaignsBtn.innerText = "❌ Ошибка";
+        setTimeout(() => {
+          saveCampaignsBtn.innerText = "Сохранить";
+          saveCampaignsBtn.style.background = "";
+          saveCampaignsBtn.style.color = "";
+        }, 2000);
       }
     };
-
 
     // === Редактировать фильтр ===
     const filterBtn = document.getElementById("filter-btn");
@@ -221,7 +225,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
     // === Сохранить фильтр ===
-    document.getElementById("save-filter").onclick = async () => {
+    const saveFilterBtn = document.getElementById("save-filter");
+    saveFilterBtn.onclick = async () => {
       const newFilter = {
         spent_zero_result: +document.getElementById("spent_zero_result").value,
         spent_zero_clicks: +document.getElementById("spent_zero_clicks").value,
@@ -231,6 +236,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         cpc_bad_value: +document.getElementById("cpc_bad_value").value
       };
 
+      const oldText = saveFilterBtn.innerText;
       try {
         const resp = await fetch(`/dashboard/api/update_filter/${uid}/${cabinetId}`, {
           method: "POST",
@@ -238,10 +244,24 @@ document.addEventListener("DOMContentLoaded", async () => {
           body: JSON.stringify({ filter: newFilter })
         });
         const data = await resp.json();
-        alert(data.message || "Фильтр сохранён");
+        saveFilterBtn.style.background = "rgba(100,255,150,0.25)";
+        saveFilterBtn.style.color = "#7cff96";
+        saveFilterBtn.innerText = "✅ " + (data.message || "Фильтр сохранён");
+        setTimeout(() => {
+          saveFilterBtn.innerText = oldText;
+          saveFilterBtn.style.background = "";
+          saveFilterBtn.style.color = "";
+        }, 2000);
       } catch (e) {
-        alert("Ошибка сохранения фильтра");
         console.error(e);
+        saveFilterBtn.style.background = "rgba(255,80,80,0.25)";
+        saveFilterBtn.style.color = "#ff7777";
+        saveFilterBtn.innerText = "❌ Ошибка";
+        setTimeout(() => {
+          saveFilterBtn.innerText = oldText;
+          saveFilterBtn.style.background = "";
+          saveFilterBtn.style.color = "";
+        }, 2000);
       }
     };
 
