@@ -149,7 +149,7 @@ async def update_filter(telegram_id: int, cabinet_id: int, request: Request):
 
 @app.post("/api/add_campaigns/{telegram_id}/{cabinet_id}")
 async def add_campaigns(telegram_id: int, cabinet_id: int, request: Request):
-    """Добавляет новые кампании в allowed_campaigns_file"""
+    """Добавляет новые кампании в allowed_campaigns_file без дубликатов"""
     data = await request.json()
     new_campaigns = data.get("campaigns", [])
 
@@ -165,12 +165,28 @@ async def add_campaigns(telegram_id: int, cabinet_id: int, request: Request):
             path = cab.get("allowed_campaigns_file")
             if not path:
                 raise HTTPException(400, "Не задан путь к файлу кампаний")
+
+            # Читаем существующие кампании (если файл есть)
+            existing = set()
+            if os.path.exists(path):
+                with open(path, "r", encoding="utf-8") as f:
+                    existing = {line.strip() for line in f if line.strip()}
+
+            # Добавляем только уникальные
+            new_unique = [c for c in new_campaigns if c not in existing]
+
+            if not new_unique:
+                return {"ok": True, "message": "Все кампании уже есть в списке."}
+
+            # Записываем новые
             with open(path, "a", encoding="utf-8") as f:
-                for c in new_campaigns:
+                for c in new_unique:
                     f.write(f"{c}\n")
-            return {"ok": True, "message": f"Добавлено {len(new_campaigns)} кампаний"}
+
+            return {"ok": True, "message": f"Добавлено {len(new_unique)} новых кампаний"}
 
     raise HTTPException(404, "Кабинет не найден")
+
 
 @app.get("/cabinet/{cabinet_id}", response_class=HTMLResponse)
 async def cabinet_settings(request: Request, cabinet_id: int):
