@@ -291,6 +291,19 @@ footer {
   margin: 0;
 }
 
+/* === Исправление: поля фильтра кликабельные === */
+#filter-section {
+  position: relative;
+  z-index: 10;
+}
+
+#filter-box,
+#filter-box input,
+.glass-input input {
+  position: relative;
+  z-index: 20;
+  pointer-events: auto;
+}
 
 /* === Адаптив под телефоны === */
 @media (max-width: 480px) {
