@@ -183,7 +183,7 @@ async def add_campaigns(telegram_id: int, cabinet_id: int, request: Request):
                 for c in new_unique:
                     f.write(f"{c}\n")
 
-            return {"ok": True, "message": f"Добавлено {len(new_unique)} новых кампаний"}
+            return {"ok": True, "message": f"Компании добавлены"}
 
     raise HTTPException(404, "Кабинет не найден")
 
