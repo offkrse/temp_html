@@ -153,20 +153,54 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
     document.getElementById("save-campaigns").onclick = async () => {
-      const text = document.getElementById("new-campaigns").value.trim();
+      const textarea = document.getElementById("new-campaigns");
+      const text = textarea.value.trim();
       if (!text) return alert("Введите хотя бы один ID кампании.");
-      const list = text.split(/\\n+/).map(x => x.trim()).filter(Boolean);
-
-      const resp = await fetch(`/dashboard/api/add_campaigns/${uid}/${cabinetId}`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({campaigns: list})
-      });
-      const data = await resp.json();
-      alert(data.message || "Сохранено");
-      document.getElementById("new-campaigns").value = "";
-      document.getElementById("add-campaign-form").style.display = "none";
+      
+      const list = text.split(/\n+/).map(x => x.trim()).filter(Boolean);
+    
+      try {
+        const resp = await fetch(`/dashboard/api/add_campaigns/${uid}/${cabinetId}`, {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({ campaigns: list })
+        });
+        const data = await resp.json();
+    
+        // alert заменяем на визуальный отклик
+        tg.HapticFeedback.notificationOccurred("success");
+        const msg = data.message || "Сохранено";
+        console.log(msg);
+    
+        // добавляем временный текст под полем вместо alert
+        let notif = document.getElementById("campaign-notif");
+        if (!notif) {
+          notif = document.createElement("div");
+          notif.id = "campaign-notif";
+          notif.style.cssText = "margin-top:6px;font-size:0.9rem;opacity:0.8;";
+          textarea.parentNode.appendChild(notif);
+        }
+        notif.textContent = msg;
+        setTimeout(() => (notif.textContent = ""), 2500);
+    
+        // очищаем поле и возвращаем фокус
+        textarea.value = "";
+        setTimeout(() => textarea.focus(), 200);
+    
+        // обновляем список компаний
+        const r = await fetch(`/dashboard/api/cabinet_campaigns/${uid}/${cabinetId}`);
+        const result = await r.json();
+        const pre = document.getElementById("campaigns-box");
+        if (result.campaigns.length) {
+          pre.textContent = result.campaigns.join("\n");
+          document.getElementById("campaign-list").style.display = "block";
+        }
+      } catch (e) {
+        tg.HapticFeedback.notificationOccurred("error");
+        console.error(e);
+      }
     };
+
 
     // === Редактировать фильтр ===
     const filterBtn = document.getElementById("filter-btn");
