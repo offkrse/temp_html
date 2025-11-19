@@ -10,7 +10,7 @@
 
   <p id="cabinet-status">Статус: <span class="status-inactive">Загрузка...</span></p>
 
-  <h3 class="settings-title">Settings</h3>
+  <h3 class="settings-title">Настройки:</h3>
 
   <!-- Основные кнопки -->
   <button id="toggle-btn" disabled>Загрузка...</button>
@@ -114,7 +114,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         toggleBtn.style.background = "rgba(100,255,150,0.25)";
         toggleBtn.style.color = "#7cff96";
-        toggleBtn.innerText = "✅ " + (r.message || "Изменено");
+        toggleBtn.innerText = (r.message || "Изменено");
         setTimeout(() => {
           toggleBtn.innerText = oldText;
           toggleBtn.style.background = "";
