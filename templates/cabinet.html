@@ -102,21 +102,30 @@ document.addEventListener("DOMContentLoaded", async () => {
     // === Переключение статуса ===
     const toggleBtn = document.getElementById("toggle-btn");
     toggleBtn.innerText = cab.active ? "Выключить кабинет" : "Включить кабинет";
+    
     toggleBtn.onclick = async () => {
       const oldText = toggleBtn.innerText;
       try {
         const resp = await fetch(`/dashboard/api/toggle/${cabinetId}`, {
           method: "POST",
           headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({telegram_id: uid})
+          body: JSON.stringify({ telegram_id: uid })
         });
         const r = await resp.json();
-
-        toggleBtn.style.background = "rgba(100,255,150,0.25)";
-        toggleBtn.style.color = "#7cff96";
-        toggleBtn.innerText = (r.message || "Изменено");
+    
+        // Определяем цвет в зависимости от нового состояния
+        const isActive = r.message.includes("Активен");
+    
+        toggleBtn.style.transition = "all 0.4s ease";
+        toggleBtn.style.background = isActive
+          ? "rgba(100,255,150,0.25)" // зелёный
+          : "rgba(255,80,80,0.25)";  // красный
+        toggleBtn.style.color = isActive ? "#7cff96" : "#ff7777";
+        toggleBtn.innerText = isActive ? "🟢 Включено" : "🔴 Выключено";
+    
+        // через 2 секунды вернуть исходное состояние
         setTimeout(() => {
-          toggleBtn.innerText = oldText;
+          toggleBtn.innerText = isActive ? "Выключить кабинет" : "Включить кабинет";
           toggleBtn.style.background = "";
           toggleBtn.style.color = "";
           location.reload();
@@ -132,6 +141,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }, 2000);
       }
     };
+
 
     // === Показать кампании ===
     const showBtn = document.getElementById("show-campaigns");
